@@ -1,3 +1,4 @@
+#pragma once
 #ifndef LIBRARY_H
 #define LIBRARY_H
 
@@ -14,6 +15,10 @@ struct Book {
     string genre;
     string publisher;
 };
+
+// Excel Database Functions
+void loadFromCSV(Book library[], int& bookCount);
+void saveToCSV(Book library[], int bookCount);
 
 // Ainaa
 void addBook(Book library[], int& bookCount);

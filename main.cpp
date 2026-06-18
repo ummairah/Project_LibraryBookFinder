@@ -6,6 +6,8 @@ int main()
     int bookCount = 0;
     int choice;
 
+    loadFromCSV(library, bookCount);
+
     do
     {
         cout << "\n===== LIBRARY SYSTEM =====\n";
@@ -13,7 +15,7 @@ int main()
         cout << "2. Display Books (Unsorted)\n";
         cout << "3. Search\n";
         cout << "4. Sort\n";
-        cout << "5. Exit\n";
+        cout << "5. Save & Exit\n";
         cout << "Enter choice: ";
         cin >> choice;
 
@@ -36,6 +38,8 @@ int main()
             break;
 
         case 5:
+
+            saveToCSV(library, bookCount);
             cout << "Exiting...\n";
             break;
 
