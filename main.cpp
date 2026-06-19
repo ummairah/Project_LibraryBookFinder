@@ -17,7 +17,12 @@ int main()
         cout << "4. Sort\n";
         cout << "5. Save & Exit\n";
         cout << "Enter choice: ";
-        cin >> choice;
+
+        if (!(cin >> choice))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+        }
 
         switch (choice)
         {

@@ -3,6 +3,30 @@
 #include <algorithm>
 #include <fstream>  
 #include <sstream>  
+#include <iomanip>
+
+//Function display in table 
+void displayBookHeader()
+{
+    cout << left << setw(5) << "No."  << setw(15) << "ISBN" << setw(35) << "Title" << setw(20) << "Genre" << setw(20) << "Publisher" << endl;
+    cout << string(85, '-') << endl;
+}
+void displayBookRow(int no, const Book& book)
+{
+    cout << left << setw(5) << no << setw(15) << book.isbn << setw(35) << book.title << setw(20) << book.genre << setw(20) << book.publisher << endl;
+}
+
+//Function to validate user input for menu choices (so if user enter char instead of int, it will not cause infinite loop)
+template <typename T>
+void getValidInput(T& value)
+{
+    if (!(cin >> value))
+    {
+        cout << "Invalid input! Please enter the right input\n";
+        cin.clear();
+        cin.ignore(1000, '\n');
+    }
+}
 
 void loadFromCSV(Book library[], int& bookCount) {
     ifstream file("book_data.csv");
@@ -26,6 +50,7 @@ void loadFromCSV(Book library[], int& bookCount) {
         getline(ss, publisher, ',');
 
         if (!title.empty()) {
+			//library[bookCount] = dummyNo;
             library[bookCount].title = title;
             library[bookCount].isbn = isbn;
             library[bookCount].genre = genre;
@@ -45,7 +70,7 @@ void saveToCSV(Book library[], int bookCount) {
     }
 
     file << "No.,Title,ISBN,Genre,Publisher\n";
-
+	//DISPLAY BOOKS IN CSV FORMAT (TUKAR DALAM TABLE)
     for (int i = 0; i < bookCount; i++) {
         file << (i + 1) << ","
             << library[i].title << ","
@@ -61,15 +86,39 @@ void saveToCSV(Book library[], int bookCount) {
 // AINAA PART
 // =====================
 void addBook(Book library[], int& bookCount) {
+    bool duplicate;
+    string isbn;
     if (bookCount >= MAX) {
         cout << "Library is full!\n";
         return;
     }
+	
+
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     cout << "Enter Title: ";
     getline(cin, library[bookCount].title);
-    cout << "Enter ISBN: ";
-    getline(cin, library[bookCount].isbn);
+   
+    //CHECK FOR DUPLICATE ISBN
+    do
+    {
+        duplicate = false;
+
+        cout << "Enter ISBN: ";
+        getline(cin, isbn);
+
+        for (int i = 0; i < bookCount; i++)
+        {
+            if (library[i].isbn == isbn)
+            {
+                cout << "ISBN already exists! Please enter a different ISBN.\n";
+                duplicate = true;
+                break;
+            }
+        }
+
+    } while (duplicate);
+    library[bookCount].isbn = isbn;
+    
     cout << "Enter Genre: ";
     getline(cin, library[bookCount].genre);
     cout << "Enter Publisher: ";
@@ -88,12 +137,9 @@ void displayBooks(Book library[], int bookCount) {
         return;
     }
     cout << "\n===== BOOK LIST =====\n";
+    displayBookHeader();
     for (int i = 0; i < bookCount; i++) {
-        cout << "\nBook " << i + 1 << endl;
-        cout << "Title     : " << library[i].title << endl;
-        cout << "ISBN      : " << library[i].isbn << endl;
-        cout << "Genre     : " << library[i].genre << endl;
-        cout << "Publisher : " << library[i].publisher << endl;
+        displayBookRow(i + 1, library[i]);
     }
 }
 
@@ -103,21 +149,18 @@ void displayBooks(Book library[], int bookCount) {
 void searchByISBN(Book library[], int bookCount) {
     string searchIsbn;
     bool found = false;
-    cout << "Enter book ISBN to search: ";
+    cout << "Enter book ISBN to search: \n";
     cin.ignore();
     getline(cin, searchIsbn);
+    displayBookHeader();
     for (int i = 0; i < bookCount; i++) {
         if (library[i].isbn == searchIsbn) {
-            cout << "\nBook Found!" << endl;
-            cout << "ISBN: " << library[i].isbn << endl;
-            cout << "Title: " << library[i].title << endl;
-            cout << "Genre: " << library[i].genre << endl;
-            cout << "Publisher: " << library[i].publisher << endl;
+            displayBookRow(i + 1, library[i]);
             found = true;
         }
     }
     if (!found) {
-        cout << "Book not found!!" << endl;
+        cout << "Book not found!" << endl;
     }
 }
 
@@ -127,13 +170,10 @@ void searchByTitle(Book library[], int bookCount) {
     cout << "Enter book title to search: ";
     cin.ignore();
     getline(cin, searchTitle);
+    displayBookHeader();
     for (int i = 0; i < bookCount; i++) {
         if (library[i].title == searchTitle) {
-            cout << "\nBook Found!" << endl;
-            cout << "ISBN: " << library[i].isbn << endl;
-            cout << "Title: " << library[i].title << endl;
-            cout << "Genre: " << library[i].genre << endl;
-            cout << "Publisher: " << library[i].publisher << endl;
+            displayBookRow(i + 1, library[i]);
             found = true;
         }
     }
@@ -150,7 +190,7 @@ void searchMenu(Book library[], int bookCount) {
         cout << "2. Search by Title\n";
         cout << "3. Back\n";
         cout << "Enter choice: ";
-        cin >> choice;
+        getValidInput(choice);
         switch (choice) {
         case 1: searchByISBN(library, bookCount); break;
         case 2: searchByTitle(library, bookCount); break;
@@ -199,18 +239,23 @@ void sortByPublisher(Book library[], int bookCount) {
 
 void sortMenu(Book library[], int bookCount) {
     int choice;
+    
     do {
+
         cout << "\n===== SORT MENU =====\n";
         cout << "1. Sort by Title (A-Z)\n";
         cout << "2. Sort by Genre\n";
         cout << "3. Sort by Publisher\n";
         cout << "4. Back\n";
         cout << "Enter choice: ";
-        cin >> choice;
+
+        getValidInput(choice);
+
         switch (choice) {
         case 1: sortByTitle(library, bookCount); break;
         case 2: sortByGenre(library, bookCount); break;
         case 3: sortByPublisher(library, bookCount); break;
+       
         }
     } while (choice != 4);
 }
